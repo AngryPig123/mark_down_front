@@ -3,6 +3,7 @@
 import axios, {Method} from "axios";
 import {MemberLoginRequestProps} from "@/type/login/login-type";
 import {cookies} from "next/headers";
+import apiClient from "@/util/axios-util";
 
 export const memberLoginApiAction = async (
     prevState: any,
@@ -15,17 +16,16 @@ export const memberLoginApiAction = async (
     }
 
     try {
-        await axios({
-            url: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/login`,
-            method: 'POST' as Method,
+        const response = await apiClient.post('/api/v1/login', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-            },
-            data: requestBody
+            }
         })
             .then(response => {
                 cookies().set("accessToken", response.data.accessToken);
+                cookies().set("refreshToken", response.data.refreshToken);
             });
+        console.log(response);
 
     } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -42,22 +42,12 @@ export const memberLoginApiAction = async (
 
 export const loginTestAction = async (): Promise<{ message: string }> => {
     try {
-        await axios({
-            url: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/login/test`,
-            method: 'GET' as Method,
-            headers: {
-                'Content-Type': 'application/json',
-                Authorization: cookies().get("accessToken")?.value
-            },
-        })
-            .then((response) => {
-                console.log(response)
-            });
+
+        const response = await apiClient.get('/api/v1/login/test');
 
     } catch (error) {
         if (axios.isAxiosError(error)) {
             const data = error.response?.data;
-            console.log('error');
             return {message: data.message};
         }
     }
