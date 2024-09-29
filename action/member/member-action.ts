@@ -1,7 +1,9 @@
 'use server'
 import {redirect} from "next/navigation";
-import {MemberInsertProps} from "@/type/member/member-type";
 import axios, {Method} from "axios";
+import backEndApiClient from "@/util/spring-axios-util";
+import {memberJoinSchema} from "@/zod/member/member";
+import {MemberJoinRequest} from "@/type/member/member-type";
 
 const renderError = (error: unknown): { message: string } => {
     return {message: error instanceof Error ? error.message : 'An error occurred'}
@@ -12,24 +14,19 @@ export const insertMemberAction = async (
     formData: FormData
 ): Promise<{ message: string }> => {
 
-    const requestBody: MemberInsertProps = {
-        loginId: formData.get('loginId') as string | null,
-        email: formData.get('email') as string | null,
-        password: formData.get('password') as string | null,
-        passwordCheck: formData.get('passwordCheck') as string | null,
-        firstName: formData.get('firstName') as string | null,
-        lastName: formData.get('lastName') as string | null,
-    }
+    const requestBody = Object.fromEntries(formData) as MemberJoinRequest
+    console.log(requestBody)
+    const validResult = memberJoinSchema.safeParse(requestBody)
+
 
     try {
-        await axios({
-            url: `${process.env.NEXT_PUBLIC_API_URL}/api/v1/member/join`,
-            method: 'POST' as Method,
+
+        await backEndApiClient.post('/api/v1/member/join', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
-            },
-            data: requestBody
-        });
+            }
+        })
+
     } catch (error) {
         if (axios.isAxiosError(error)) {
             const data = error.response?.data;

@@ -1,8 +1,8 @@
-export type MemberInsertProps = {
-    loginId: string | null;
-    email: string | null;
-    password: string | null;
-    passwordCheck: string | null;
-    firstName: string | null;
-    lastName: string | null;
+export type MemberJoinRequest = {
+    loginId: string
+    email: string
+    password: string
+    passwordCheck: string
+    firstName: string
+    lastName: string
 }

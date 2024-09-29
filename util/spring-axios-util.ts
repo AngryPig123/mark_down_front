@@ -1,7 +1,7 @@
 import axios from "axios";
 import {cookies} from "next/headers";
 
-const apiClient = axios.create({
+const backEndApiClient = axios.create({
     baseURL: `${process.env.NEXT_PUBLIC_API_URL}`,
     withCredentials: true,
 })
@@ -19,14 +19,19 @@ const getCookieValue = (name: string) => {
     }
 };
 
-apiClient.interceptors.request.use((config) => {
+backEndApiClient.interceptors.request.use((config) => {
+
     const token = getCookieValue('accessToken');
     if (token) {
         config.headers['Authorization'] = `${token}`;
+    }
+    const csrfToken = getCookieValue('csrfToken'); // 쿠키에서 CSRF 토큰 가져오기
+    if (csrfToken) {
+        config.headers['X-CSRF-Token'] = csrfToken; // CSRF 토큰을 요청 헤더에 추가
     }
     return config;
 }, (error) => {
     return Promise.reject(error);
 });
 
-export default apiClient;
+export default backEndApiClient;

@@ -3,7 +3,7 @@
 import axios, {Method} from "axios";
 import {MemberLoginRequestProps} from "@/type/login/login-type";
 import {cookies} from "next/headers";
-import apiClient from "@/util/axios-util";
+import backEndApiClient from "@/util/spring-axios-util";
 
 export const memberLoginApiAction = async (
     prevState: any,
@@ -16,7 +16,7 @@ export const memberLoginApiAction = async (
     }
 
     try {
-        const response = await apiClient.post('/api/v1/login', requestBody, {
+        const response = await backEndApiClient.post('/api/v1/login', requestBody, {
             headers: {
                 'Content-Type': 'application/json',
             }
@@ -43,7 +43,7 @@ export const memberLoginApiAction = async (
 export const loginTestAction = async (): Promise<{ message: string }> => {
     try {
 
-        const response = await apiClient.get('/api/v1/login/test');
+        const response = await backEndApiClient.get('/api/v1/login/test');
 
     } catch (error) {
         if (axios.isAxiosError(error)) {
